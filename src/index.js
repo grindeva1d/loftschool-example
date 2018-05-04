@@ -17,12 +17,16 @@
    isAllTrue([100, 2, 3, 4, 5], n => n < 10) // вернет false
  */
 function isAllTrue(array, fn) {
-    if (!Array.isArray(array) || array.length == 0)
-        throw new Error("empty array");
-    if (!(fn instanceof Function))
-        throw new Error("fn is not a function");
+    if (!Array.isArray(array) || array.length == 0) {
+        throw new Error('empty array');
+    }
+    if (!(fn instanceof Function)) {
+        throw new Error('fn is not a function');
+    }
 
-    return array.every((v) => { return fn(v); });
+    return array.every((v) => {
+        return fn(v);
+    });
 }
 
 /*
@@ -42,12 +46,16 @@ function isAllTrue(array, fn) {
    isSomeTrue([1, 2, 3, 4, 5], n => n > 20) // вернет false
  */
 function isSomeTrue(array, fn) {
-    if (!Array.isArray(array) || array.length == 0)
-        throw new Error("empty array");
-    if (!(fn instanceof Function))
-        throw new Error("fn is not a function");
+    if (!Array.isArray(array) || array.length == 0) {
+        throw new Error('empty array');
+    }
+    if (!(fn instanceof Function)) {
+        throw new Error('fn is not a function');
+    }
 
-    return array.some((v) => { return fn(v); });
+    return array.some((v) => {
+        return fn(v);
+    });
 }
 
 /*
@@ -62,8 +70,9 @@ function isSomeTrue(array, fn) {
    - fn не является функцией (с текстом "fn is not a function")
  */
 function returnBadArguments(fn, ...args) {
-    if (!(fn instanceof Function))
-        throw new Error("fn is not a function");
+    if (!(fn instanceof Function)) {
+        throw new Error('fn is not a function');
+    }
 
     const result = [];
 
@@ -96,16 +105,18 @@ function returnBadArguments(fn, ...args) {
    - какой-либо из аргументов div является нулем (с текстом "division by 0")
  */
 function calculator(number = 0) {
-    if (isNaN(parseFloat(number)) || !isFinite(number))
-        throw new Error("number is not a number");
+    if (isNaN(parseFloat(number)) || !isFinite(number)) {
+        throw new Error('number is not a number');
+    }
 
     return {
         sum: (...args) => { return args.reduce((prev, cur) => { return prev + cur; }, number); },
         dif: (...args) => { return args.reduce((prev, cur) => { return prev - cur; }, number); },
         div: (...args) => {
             return args.reduce((prev, cur) => {
-                if (cur == 0)
-                    throw new Error("division by 0");
+                if (cur == 0) {
+                    throw new Error('division by 0');
+                }
                 return prev / cur;
             }, number);
         },
