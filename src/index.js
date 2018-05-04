@@ -17,9 +17,12 @@
    isAllTrue([100, 2, 3, 4, 5], n => n < 10) // вернет false
  */
 function isAllTrue(array, fn) {
-    if (!Array.isArray(array) || array.length == 0) {
+    if (!Array.isArray(array) || array.length == 0)
         throw new Error("empty array");
-    }
+    if (!(fn instanceof Function))
+        throw new Error("fn is not a function");
+
+    return array.every((v) => { return fn(v); });
 }
 
 /*
@@ -39,6 +42,12 @@ function isAllTrue(array, fn) {
    isSomeTrue([1, 2, 3, 4, 5], n => n > 20) // вернет false
  */
 function isSomeTrue(array, fn) {
+    if (!Array.isArray(array) || array.length == 0)
+        throw new Error("empty array");
+    if (!(fn instanceof Function))
+        throw new Error("fn is not a function");
+
+    return array.some((v) => { return fn(v); });
 }
 
 /*
@@ -52,7 +61,21 @@ function isSomeTrue(array, fn) {
  3.3: Необходимо выбрасывать исключение в случаях:
    - fn не является функцией (с текстом "fn is not a function")
  */
-function returnBadArguments(fn) {
+function returnBadArguments(fn, ...args) {
+    if (!(fn instanceof Function))
+        throw new Error("fn is not a function");
+
+    const result = [];
+
+    args.forEach((item) => {
+        try {
+            fn(item);
+        } catch (error) {
+            result.push(item);
+        }
+    });
+
+    return result;
 }
 
 /*
@@ -72,7 +95,22 @@ function returnBadArguments(fn) {
    - number не является числом (с текстом "number is not a number")
    - какой-либо из аргументов div является нулем (с текстом "division by 0")
  */
-function calculator() {
+function calculator(number = 0) {
+    if (isNaN(parseFloat(number)) || !isFinite(number))
+        throw new Error("number is not a number");
+
+    return {
+        sum: (...args) => { return args.reduce((prev, cur) => { return prev + cur; }, number); },
+        dif: (...args) => { return args.reduce((prev, cur) => { return prev - cur; }, number); },
+        div: (...args) => {
+            return args.reduce((prev, cur) => {
+                if (cur == 0)
+                    throw new Error("division by 0");
+                return prev / cur;
+            }, number);
+        },
+        mul: (...args) => { return args.reduce((prev, cur) => { return prev * cur; }, number); }
+    };
 }
 
 /* При решении задач, пострайтесь использовать отладчик */
