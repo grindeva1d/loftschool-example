@@ -19,7 +19,7 @@ function forEach(array, fn) {
  Посмотрите как работает map и повторите это поведение для массива, который будет передан в параметре array
  */
 function map(array, fn) {
-    let result = [];
+    const result = [];
 
     for (let i = 0; i < array.length; i++) {
         result[i] = fn(array[i], i, array);
@@ -35,15 +35,15 @@ function map(array, fn) {
  Посмотрите как работает reduce и повторите это поведение для массива, который будет передан в параметре array
  */
 function reduce(array, fn, initial) {
-    let i = initial ? 0 : 1;
+    let i = arguments.length == 3 ? 0 : 1;
 
-    initial = initial ? initial : array[0];
+    let prev = arguments.length == 3 ? initial : array[0];
 
     for (; i < array.length; i++) {
-        initial = fn(initial, array[i], i, array);
+        prev = fn(prev, array[i], i, array);
     }
 
-    return initial;
+    return prev;
 }
 
 /*
@@ -55,13 +55,7 @@ function reduce(array, fn, initial) {
    upperProps({ name: 'Сергей', lastName: 'Петров' }) вернет ['NAME', 'LASTNAME']
  */
 function upperProps(obj) {
-    let result = [];
-
-    for (let key in obj) {
-        result.push(key.toUpperCase());
-    }
-
-    return result;
+    return Object.keys(obj).map((v) => { return v.toUpperCase(); });
 }
 
 /*
@@ -77,7 +71,7 @@ function slice(array, from = 0, to = array.length) {
     to = Math.min(array.length, to >= 0 ? to : array.length + to);
 
     for (let i = from; i < to; i++) {
-        result.push(array[i]);        
+        result.push(array[i]);
     }
 
     return result;
