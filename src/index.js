@@ -24,9 +24,12 @@ function isAllTrue(array, fn) {
         throw new Error('fn is not a function');
     }
 
-    return array.every((v) => {
-        return fn(v);
-    });
+    for (let i = 0; i < array.length; i++) {
+        if (!fn(array[i]))
+            return false;
+    }
+
+    return true;
 }
 
 /*
@@ -53,9 +56,13 @@ function isSomeTrue(array, fn) {
         throw new Error('fn is not a function');
     }
 
-    return array.some((v) => {
-        return fn(v);
-    });
+    
+    for (let i = 0; i < array.length; i++) {
+        if (fn(array[i]))
+            return true;
+    }
+
+    return false;
 }
 
 /*
@@ -110,8 +117,8 @@ function calculator(number = 0) {
     }
 
     return {
-        sum: (...args) => { return args.reduce((prev, cur) => { return prev + cur; }, number); },
-        dif: (...args) => { return args.reduce((prev, cur) => { return prev - cur; }, number); },
+        sum: (...args) => { return args.reduce((prev, cur) => prev + cur, number); },
+        dif: (...args) => { return args.reduce((prev, cur) => prev - cur, number); },
         div: (...args) => {
             return args.reduce((prev, cur) => {
                 if (cur == 0) {
@@ -120,7 +127,7 @@ function calculator(number = 0) {
                 return prev / cur;
             }, number);
         },
-        mul: (...args) => { return args.reduce((prev, cur) => { return prev * cur; }, number); }
+        mul: (...args) => { return args.reduce((prev, cur) => prev * cur, number); }
     };
 }
 
