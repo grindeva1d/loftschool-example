@@ -9,6 +9,7 @@
    addListener('click', document.querySelector('a'), () => console.log('...')) // должна добавить указанный обработчик кликов на указанный элемент
  */
 function addListener(eventName, target, fn) {
+    target.addEventListener(eventName, fn);
 }
 
 /*
@@ -20,6 +21,7 @@ function addListener(eventName, target, fn) {
    removeListener('click', document.querySelector('a'), someHandler) // должна удалить указанный обработчик кликов на указанный элемент
  */
 function removeListener(eventName, target, fn) {
+    target.removeEventListener(eventName, fn);
 }
 
 /*
@@ -31,6 +33,7 @@ function removeListener(eventName, target, fn) {
    skipDefault('click', document.querySelector('a')) // после вызова функции, клики на указанную ссылку не должны приводить к переходу на другую страницу
  */
 function skipDefault(eventName, target) {
+    target.addEventListener(eventName, (e) => { e.preventDefault(); })
 }
 
 /*
@@ -42,6 +45,7 @@ function skipDefault(eventName, target) {
    emulateClick(document.querySelector('a')) // для указанного элемента должно быть сэмулировано события click
  */
 function emulateClick(target) {
+    target.click();
 }
 
 /*
