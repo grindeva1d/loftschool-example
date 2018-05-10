@@ -12,7 +12,9 @@
  */
 function createDivWithText(text) {
     let div = document.createElement('div');
+
     div.innerText = text;
+
     return div;
 }
 
@@ -25,7 +27,7 @@ function createDivWithText(text) {
    prepend(document.querySelector('#one'), document.querySelector('#two')) // добавит элемент переданный первым аргументом в начало элемента переданного вторым аргументом
  */
 function prepend(what, where) {
-    where.insertBefore(div2, where.firstChild);
+    where.insertBefore(what, where.firstChild);
 }
 
 /*
@@ -48,8 +50,8 @@ function prepend(what, where) {
    findAllPSiblings(document.body) // функция должна вернуть массив с элементами div и span т.к. следующим соседом этих элементов является элемент с тегом P
  */
 function findAllPSiblings(where) {
-    [...where.children].filter((v) => {
-        return v.nextElementSibling.nodeName === 'P';
+    return [...where.children].filter((v) => {
+        return !!v.nextElementSibling && v.nextElementSibling.nodeName === 'P';
     });
 }
 
@@ -143,6 +145,77 @@ function deleteTextNodesRecursive(where) {
    }
  */
 function collectDOMStat(root) {
+    return {
+        tags: tagNodeCount(root, 0),
+        classes: classNodeCount(root),
+        texts: textNodeCount(root)
+    }
+}
+
+function tagNodeCount(node, depth) {
+    let result = {};
+
+    if (node.nodeType === 1) {
+        if (depth !== 0) {
+            result[node.nodeName] = 1;
+        }
+
+        for (const child of node.children) {
+            let childTags = tagNodeCount(child, ++depth);
+
+            for (const tag in childTags) {
+                if (childTags.hasOwnProperty(tag)) {
+                    if (result.hasOwnProperty(tag)) {
+                        result[tag] = +result[tag] + +childTags[tag];
+                    } else {
+                        result[tag] = +childTags[tag];
+                    }
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+function classNodeCount(node) {
+    let result = {};
+
+    if (node.nodeType === 1) {
+        for (const cls of node.classList) {
+            result[cls] = 1;
+        }
+
+        for (const child of node.children) {
+            let childTags = classNodeCount(child);
+
+            for (const tag in childTags) {
+                if (childTags.hasOwnProperty(tag)) {
+                    if (result.hasOwnProperty(tag)) {
+                        result[tag] = +result[tag] + +childTags[tag];
+                    } else {
+                        result[tag] = +childTags[tag];
+                    }
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+function textNodeCount(node) {
+    if (node.nodeType === 3) {
+        return 1;
+    }
+
+    let result = [...node.childNodes].filter((v) => v.nodeType === 1).length;
+
+    for (const child of node.children) {
+        result += textNodeCount(child);
+    }
+
+    return result;
 }
 
 /*
@@ -178,6 +251,13 @@ function collectDOMStat(root) {
    }
  */
 function observeChildNodes(where, fn) {
+    let mut = new MutationObserver((objects) => {
+        for (let i = 0; i < objects.length; i++) {
+            fn({ type: objects[i].addedNodes.length > 0 ? 'insert' : 'remove', nodes: objects[i].addedNodes.length > 0 ? [...objects[i].addedNodes] : [...objects[i].removedNodes] });
+        }
+    });
+    
+    mut.observe(where, { childList: true, subtree: true });
 }
 
 export {
