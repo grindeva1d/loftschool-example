@@ -28,14 +28,15 @@ const homeworkContainer = document.querySelector('#homework-container');
  */
 function createDiv() {
     let div = document.createElement('div');
-    
+
     div.classList = 'draggable-div';
     div.style.height = random(50, 200) + 'px';
     div.style.width = random(50, 200) + 'px';
     div.style.position = 'absolute';
     div.style.left = random(0, 500) + 'px';
-    div.style.right = random(0, 500) + 'px';
+    div.style.top = random(0, 500) + 'px';
     div.style.backgroundColor = getRandomColor();
+    div.style.cursor = 'pointer';
 
     return div;
 }
@@ -49,6 +50,29 @@ function createDiv() {
    addListeners(newDiv);
  */
 function addListeners(target) {
+    target.onmousedown = (e) => {
+        let { left, top } = target.getBoundingClientRect();
+
+        let offsetLeft = e.pageX - left;
+        let offsetTop = e.pageY - top;
+
+        moveAt(e);
+
+        document.onmousemove = (e) => {
+            moveAt(e);
+        };
+
+        function moveAt(e) {
+            target.style.left = (e.pageX - offsetLeft) + 'px';
+            target.style.top = (e.pageY - offsetTop) + 'px';
+        }
+
+        target.onmouseup = () => {
+            target.onmouseup = null;
+            document.onmousemove = null;
+        };
+
+    };
 }
 
 let addDivButton = homeworkContainer.querySelector('#addDiv');
@@ -67,7 +91,7 @@ addDivButton.addEventListener('click', function () {
 
 function random(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
-};
+}
 
 function getRandomColor() {
     let letters = '0123456789ABCDEF';
@@ -78,7 +102,7 @@ function getRandomColor() {
     }
 
     return color;
-};
+}
 
 export {
     createDiv
