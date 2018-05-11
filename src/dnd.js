@@ -27,6 +27,17 @@ const homeworkContainer = document.querySelector('#homework-container');
    homeworkContainer.appendChild(newDiv);
  */
 function createDiv() {
+    let div = document.createElement('div');
+    
+    div.classList = 'draggable-div';
+    div.style.height = random(50, 200) + 'px';
+    div.style.width = random(50, 200) + 'px';
+    div.style.position = 'absolute';
+    div.style.left = random(0, 500) + 'px';
+    div.style.right = random(0, 500) + 'px';
+    div.style.backgroundColor = getRandomColor();
+
+    return div;
 }
 
 /*
@@ -42,7 +53,7 @@ function addListeners(target) {
 
 let addDivButton = homeworkContainer.querySelector('#addDiv');
 
-addDivButton.addEventListener('click', function() {
+addDivButton.addEventListener('click', function () {
     // создать новый div
     const div = createDiv();
 
@@ -53,6 +64,21 @@ addDivButton.addEventListener('click', function() {
     // можно не назначать обработчики событий каждому div в отдельности, а использовать делегирование
     // или использовать HTML5 D&D - https://www.html5rocks.com/ru/tutorials/dnd/basics/
 });
+
+function random(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+};
+
+function getRandomColor() {
+    let letters = '0123456789ABCDEF';
+    let color = '#';
+
+    for (let i = 0; i < 6; i++) {
+        color += letters[random(0, 15)];
+    }
+
+    return color;
+};
 
 export {
     createDiv
