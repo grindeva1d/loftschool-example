@@ -94,14 +94,7 @@ function random(min, max) {
 }
 
 function getRandomColor() {
-    let letters = '0123456789ABCDEF';
-    let color = '#';
-
-    for (let i = 0; i < 6; i++) {
-        color += letters[random(0, 15)];
-    }
-
-    return color;
+    return `rgb(${random(0, 255)}, ${random(0, 255)}, ${random(0, 255)})`;
 }
 
 export {
