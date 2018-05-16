@@ -1,3 +1,5 @@
+import { loadAndSortTowns } from '../src/index';
+
 /*
  Страница должна предварительно загрузить список городов из
  https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json
@@ -36,8 +38,40 @@ const homeworkContainer = document.querySelector('#homework-container');
  Массив городов пожно получить отправив асинхронный запрос по адресу
  https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json
  */
+
+let towns = [];
+
 function loadTowns() {
+    return loadAndSortTowns();
 }
+
+(function handlerTowns() {
+    loadTowns()
+        .then((response) => {
+            towns = response;
+            loadingBlock.style.display = 'none';
+            filterBlock.style.display = 'block';
+        })
+        .catch(() => {
+            loadingBlock.style.display = 'none';
+
+            let repeatBlock = document.createElement('div');
+            let repeatText = document.createElement('p');
+            repeatText.textContent = 'Не удалось загрузить города';
+            let repeatBtn = document.createElement('button');
+            repeatBtn.textContent = 'Повторить';
+            repeatBtn.onclick = () => {
+                setTimeout(() => {
+                    handlerTowns();
+                    homeworkContainer.removeChild(repeatBlock);
+                }, 500);
+            };
+
+            repeatBlock.appendChild(repeatText);
+            repeatBlock.appendChild(repeatBtn);
+            homeworkContainer.appendChild(repeatBlock);
+        });
+})();
 
 /*
  Функция должна проверять встречается ли подстрока chunk в строке full
@@ -51,6 +85,7 @@ function loadTowns() {
    isMatching('Moscow', 'Moscov') // false
  */
 function isMatching(full, chunk) {
+    return !!~full.toLowerCase().indexOf(chunk.toLowerCase());
 }
 
 /* Блок с надписью "Загрузка" */
@@ -62,8 +97,19 @@ const filterInput = homeworkContainer.querySelector('#filter-input');
 /* Блок с результатами поиска */
 const filterResult = homeworkContainer.querySelector('#filter-result');
 
-filterInput.addEventListener('keyup', function() {
+filterInput.addEventListener('keyup', function () {
     // это обработчик нажатия кливиш в текстовом поле
+    filterResult.innerHTML = '';
+
+    let filterValue = filterInput.value;
+
+    if (filterValue) {
+        for (const town of towns.filter((v) => isMatching(v.name, filterValue))) {
+            let townBlock = document.createElement('div');
+            townBlock.textContent = town.name;
+            filterResult.appendChild(townBlock);
+        }
+    }
 });
 
 export {
