@@ -26,7 +26,7 @@ function delayPromise(seconds) {
    loadAndSortTowns().then(towns => console.log(towns)) // должна вывести в консоль отсортированный массив городов
  */
 function loadAndSortTowns() {
-    let url = 'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json';
+    let url = 'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities1.json';
     return fetch(url)
         .then(errorHandling)
         .then(response => response.json())
@@ -35,7 +35,8 @@ function loadAndSortTowns() {
 
 function errorHandling(response) {
     if (!response.ok) {
-        throw new Error(`status: ${response.status} statusText: ${response.statusText}`);
+        //throw new Error(`status: ${response.status} statusText: ${response.statusText}`);
+        return new Promise.reject(`status: ${response.status} statusText: ${response.statusText}`);
     }
     return response;
 }
