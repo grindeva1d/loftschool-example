@@ -43,10 +43,85 @@ const addButton = homeworkContainer.querySelector('#add-button');
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
-filterNameInput.addEventListener('keyup', function() {
+filterNameInput.addEventListener('keyup', function () {
     // здесь можно обработать нажатия на клавиши внутри текстового поля для фильтрации cookie
 });
 
 addButton.addEventListener('click', () => {
-    // здесь можно обработать нажатие на кнопку "добавить cookie"
+    let cookieName = addNameInput.value;
+    let cookieValue = addValueInput.value;
+
+    addCookie({ table:listTable, name: cookieName, value: cookieValue, callback: addRow });
 });
+
+function fillCookies() {
+    let cookies = parseCookies();
+
+    for (const cookie in cookies) {
+        addRow(listTable, cookie, cookies[cookie]);
+    }
+}
+
+fillCookies();
+
+function parseCookies() {
+    return document.cookie.split('; ').reduce((prev, curr) => {
+        let [name, value] = curr.split('=');
+        if (name && value) {
+            prev[name] = decodeURIComponent(value);
+        }
+        return prev;
+    }, {});
+}
+
+function addCookie({ table, name, value, expires, callback }) {
+    if (name && value) {
+        let cookie = `${name}=${encodeURIComponent(value)}`;
+        document.cookie = cookie;
+        if (callback) {
+            callback(table, name, value);
+        }
+    }
+}
+
+function deleteCookie({ table, name, callback}) {
+    if (name) {
+        document.cookie = `${name}=; expires=${new Date(Date.now() - 1).toGMTString()}`;
+        if (callback) {
+            callback(table, name);
+        }
+    }
+}
+
+function addRow(table, name, value) {
+
+    let row = findRow(table, name);
+
+    if (row) {
+        row.cells[1].textContent = value;
+    } else {
+        let row = table.insertRow();
+        let nameCell = row.insertCell();
+        let valueCell = row.insertCell();
+        let deleteCell = row.insertCell();
+        let deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'X';
+        deleteBtn.addEventListener('click', () => {
+            deleteCookie({ table: table, name: name, callback: deleteRow });
+        });
+        nameCell.textContent = name;
+        valueCell.textContent = value;
+        deleteCell.appendChild(deleteBtn);
+    }
+}
+
+function deleteRow(table, name) {
+    let row = findRow(table, name);
+    if (row) {
+        table.deleteRow(row);
+    }
+}
+
+function findRow(table, name) {
+    return [...table.rows].find((row) => row.cells[0].textContent == name);
+}
