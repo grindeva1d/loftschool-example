@@ -43,19 +43,31 @@ const addButton = homeworkContainer.querySelector('#add-button');
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
+let timeout;
+
 filterNameInput.addEventListener('keyup', function () {
-    // здесь можно обработать нажатия на клавиши внутри текстового поля для фильтрации cookie
+
+    if (timeout) {
+        window.clearTimeout(timeout);
+    }
+
+    timeout = setTimeout(() => {
+        fillCookies(filterNameInput.value);
+    }, 1000);
 });
 
 addButton.addEventListener('click', () => {
     let cookieName = addNameInput.value;
+    addNameInput.value = '';
     let cookieValue = addValueInput.value;
+    addValueInput.value = '';
 
-    addCookie({ table:listTable, name: cookieName, value: cookieValue, callback: addRow });
+    addCookie({ table: listTable, name: cookieName, value: cookieValue, callback: addRow });
 });
 
-function fillCookies() {
-    let cookies = parseCookies();
+function fillCookies(filter) {
+    listTable.innerHTML = '';
+    let cookies = parseCookies(filter);
 
     for (const cookie in cookies) {
         addRow(listTable, cookie, cookies[cookie]);
@@ -64,10 +76,10 @@ function fillCookies() {
 
 fillCookies();
 
-function parseCookies() {
+function parseCookies(filter) {
     return document.cookie.split('; ').reduce((prev, curr) => {
         let [name, value] = curr.split('=');
-        if (name && value) {
+        if (name && value && (!filter || isMatching(name, filter))) {
             prev[name] = decodeURIComponent(value);
         }
         return prev;
@@ -84,7 +96,7 @@ function addCookie({ table, name, value, expires, callback }) {
     }
 }
 
-function deleteCookie({ table, name, callback}) {
+function deleteCookie({ table, name, callback }) {
     if (name) {
         document.cookie = `${name}=; expires=${new Date(Date.now() - 1).toGMTString()}`;
         if (callback) {
@@ -124,4 +136,8 @@ function deleteRow(table, name) {
 
 function findRow(table, name) {
     return [...table.rows].find((row) => row.cells[0].textContent == name);
+}
+
+function isMatching(full, chunk) {
+    return !!~full.toLowerCase().indexOf(chunk.toLowerCase());
 }
