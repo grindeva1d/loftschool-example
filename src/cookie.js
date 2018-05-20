@@ -43,26 +43,19 @@ const addButton = homeworkContainer.querySelector('#add-button');
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
-let timeout;
-
 filterNameInput.addEventListener('keyup', function () {
-
-    if (timeout) {
-        window.clearTimeout(timeout);
-    }
-
-    timeout = setTimeout(() => {
-        fillCookies(filterNameInput.value);
-    }, 1000);
+    fillCookies(filterNameInput.value);
 });
 
 addButton.addEventListener('click', () => {
-    let cookieName = addNameInput.value;
-    addNameInput.value = '';
-    let cookieValue = addValueInput.value;
-    addValueInput.value = '';
 
-    addCookie({ table: listTable, name: cookieName, value: cookieValue, callback: addRow });
+    let cookieName = addNameInput.value;
+    let cookieValue = addValueInput.value;
+
+    if (cookieName && cookieValue) {
+        document.cookie = `${cookieName}=${cookieValue}`;
+        addRow(cookieName, cookieValue);
+    }
 });
 
 function fillCookies(filter) {
@@ -70,7 +63,7 @@ function fillCookies(filter) {
     let cookies = parseCookies(filter);
 
     for (const cookie in cookies) {
-        addRow(listTable, cookie, cookies[cookie]);
+        addRow(cookie, cookies[cookie]);
     }
 }
 
@@ -79,47 +72,42 @@ fillCookies();
 function parseCookies(filter) {
     return document.cookie.split('; ').reduce((prev, curr) => {
         let [name, value] = curr.split('=');
-        if (name && value && (!filter || isMatching(name, filter))) {
-            prev[name] = decodeURIComponent(value);
+        if (name && value && (!filter || isMatching(name, filter) || isMatching(value, filter))) {
+            prev[name] = value;
         }
         return prev;
     }, {});
 }
 
-function addCookie({ table, name, value, expires, callback }) {
-    if (name && value) {
-        let cookie = `${name}=${encodeURIComponent(value)}`;
-        document.cookie = cookie;
-        if (callback) {
-            callback(table, name, value);
-        }
-    }
+function deleteCookie(row) {
+    document.cookie = `${row.cells[0].textContent}=; expires=${new Date(0)}`;
+    listTable.deleteRow(row);
 }
 
-function deleteCookie({ table, name, callback }) {
-    if (name) {
-        document.cookie = `${name}=; expires=${new Date(Date.now() - 1).toGMTString()}`;
-        if (callback) {
-            callback(table, name);
-        }
-    }
-}
+function addRow(name, value) {
 
-function addRow(table, name, value) {
-
-    let row = findRow(table, name);
+    let row = findRow(name);
+    let filterValue = filterNameInput.value;
 
     if (row) {
-        row.cells[1].textContent = value;
+        if (filterValue && !isMatching(value, filterValue)) {
+            listTable.deleteRow(row);
+        }
+        else {
+            row.cells[1].textContent = value;
+        }
     } else {
-        let row = table.insertRow();
+        if (filterValue && !(isMatching(name, filterValue) || isMatching(value, filterValue))) return;
+
+        let row = listTable.insertRow();
         let nameCell = row.insertCell();
         let valueCell = row.insertCell();
         let deleteCell = row.insertCell();
         let deleteBtn = document.createElement('button');
         deleteBtn.textContent = 'X';
         deleteBtn.addEventListener('click', () => {
-            deleteCookie({ table: table, name: name, callback: deleteRow });
+            let deleteRow = row;
+            deleteCookie(deleteRow);
         });
         nameCell.textContent = name;
         valueCell.textContent = value;
@@ -127,15 +115,8 @@ function addRow(table, name, value) {
     }
 }
 
-function deleteRow(table, name) {
-    let row = findRow(table, name);
-    if (row) {
-        table.deleteRow(row);
-    }
-}
-
-function findRow(table, name) {
-    return [...table.rows].find((row) => row.cells[0].textContent == name);
+function findRow(name) {
+    return [...listTable.rows].find((row) => row.cells[0].textContent == name);
 }
 
 function isMatching(full, chunk) {
