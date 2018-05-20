@@ -72,9 +72,11 @@ fillCookies();
 function parseCookies(filter) {
     return document.cookie.split('; ').reduce((prev, curr) => {
         let [name, value] = curr.split('=');
+
         if (name && value && (!filter || isMatching(name, filter) || isMatching(value, filter))) {
             prev[name] = value;
         }
+
         return prev;
     }, {});
 }
@@ -92,8 +94,7 @@ function addRow(name, value) {
     if (row) {
         if (filterValue && !isMatching(value, filterValue)) {
             listTable.deleteRow(row);
-        }
-        else {
+        } else {
             row.cells[1].textContent = value;
         }
     } else {
@@ -104,9 +105,11 @@ function addRow(name, value) {
         let valueCell = row.insertCell();
         let deleteCell = row.insertCell();
         let deleteBtn = document.createElement('button');
+
         deleteBtn.textContent = 'X';
         deleteBtn.addEventListener('click', () => {
             let deleteRow = row;
+            
             deleteCookie(deleteRow);
         });
         nameCell.textContent = name;
