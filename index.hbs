@@ -1,9 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>{{htmlWebpackPlugin.options.title}}</title>
+  <title>Title</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+  <script src="http://vk.com/js/api/openapi.js" type="text/javascript"></script>
+
+  <style>
+    .friend {
+      float: left;
+      margin: 15px;
+    }
+
+    .video {
+      height: 152px;
+      width: 305px;
+
+      display: inline-block;
+    }
+  </style>
 </head>
+
 <body>
+  <div class="container">
+    <div id="header"></div>
+
+    <div class="btn-group btn-group-lg">
+      <button type="button" class="btn btn-default" onclick="Router.handle('friends')">Друзья</button>
+      <button type="button" class="btn btn-default" onclick="Router.handle('news')">Новости</button>
+      <button type="button" class="btn btn-default" onclick="Router.handle('videos')">Видео</button>
+    </div>
+    <hr>
+    <div id="results"></div>
+  </div>
+
+  <script src="./src/model.js"></script>
+  <script src="./src/view.js"></script>
+  <script src="./src/controller.js"></script>
+  <script src="./src/router.js"></script>
+  <script src="./src/index.js"></script>
+
+  <script type="text/x-handlebars-template" id="headerTemplate">
+    <h1>Данные из VK-аккаунта {{first_name}} {{last_name}}</h1>
+    </script>
+
+  <script type="text/x-handlebars-template" id="friendsTemplate">
+    <div id="friendsList">
+        {{#each list}}
+        <div class="friend text-center">
+            <img src="{{photo_100}}" class="img-circle">
+            <div>{{first_name}}<br>{{last_name}}</div>
+        </div>
+        {{/each}}
+    </div>
+</script>
+
+  <script type="text/x-handlebars-template" id="newsTemplate">
+    <div class="news">
+        {{#each list}}
+        {{#if text}}
+        <div class="post">
+            <b>{{formatDate date}}</b>
+            <div class="post-text">{{{text}}}</div>
+        </div>
+        <hr>
+        {{/if}}
+        {{/each}}
+    </div>
+</script>
+
+  <script type="text/x-handlebars-template" id="videosTemplate">
+    <div class="videos">
+        {{#each list}}
+        <div class="video">
+          <iframe src="{{{ player }}}"></iframe>
+        </div>
+        {{/each}}
+    </div>
+</script>
 </body>
+
 </html>
