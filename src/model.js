@@ -38,6 +38,9 @@ window.Model = {
     },
     getVideos(params = {}) {
         return this.callApi('video.get', params);
+    },
+    getGroups(params = {}) {
+        return this.callApi('groups.get', params);
     }
 };
 

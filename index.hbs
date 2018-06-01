@@ -20,6 +20,22 @@
 
       display: inline-block;
     }
+
+    .group {
+      width: 160px;
+      height: 200px;
+
+      display: inline-block;
+      vertical-align: top;
+      padding: 20px;
+    }
+
+    .group img {
+      width: 100px;
+      height: 100px;
+
+      display: block;
+    }
   </style>
 </head>
 
@@ -31,6 +47,7 @@
       <button type="button" class="btn btn-default" onclick="Router.handle('friends')">Друзья</button>
       <button type="button" class="btn btn-default" onclick="Router.handle('news')">Новости</button>
       <button type="button" class="btn btn-default" onclick="Router.handle('videos')">Видео</button>
+      <button type="button" class="btn btn-default" onclick="Router.handle('groups')">Группы</button>
     </div>
     <hr>
     <div id="results"></div>
@@ -76,6 +93,17 @@
         {{#each list}}
         <div class="video">
           <iframe src="{{{ player }}}"></iframe>
+        </div>
+        {{/each}}
+    </div>
+</script>
+
+<script type="text/x-handlebars-template" id="groupsTemplate">
+    <div class="groups">
+        {{#each list}}
+        <div class="group">
+          <img src="{{{ photo_100 }}}" alt="">
+          {{{ name }}}
         </div>
         {{/each}}
     </div>

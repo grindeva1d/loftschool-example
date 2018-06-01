@@ -13,7 +13,7 @@ Handlebars.registerHelper('formatDate', ts => {
 });
 
 
-Model.login(6487703, 2 | 16 | 8192)
+Model.login(6487703, 2 | 16 | 8192 | 262144)
     .then(() => {
         return Model.getUser({ name_case: 'gen' }).then(([me]) => {
             const header = document.querySelector('#header');
