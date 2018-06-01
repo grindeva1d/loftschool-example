@@ -1,9 +1,172 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>{{htmlWebpackPlugin.options.title}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            font: 21px Helvetica;
+            user-select: none;
+        }
+
+        #myCanvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .tools {
+            position: absolute;
+            right: 0;
+        }
+
+        .tool {
+            margin-top: 20px;
+            border: 1px solid rgb(139, 195, 254);
+            border-radius: 5px 0 0 5px;
+            border-right: none;
+            padding: 10px;
+            background: rgba(139, 195, 254, 0.7);
+        }
+
+        .shape {
+            border-bottom: 1px dashed #1280f2;
+            color: #1280f2;
+            cursor: pointer;
+        }
+
+        .shape~.shape {
+            margin-top: 5px;
+        }
+
+        .shape:hover {
+            color: #555;
+        }
+    </style>
 </head>
+
 <body>
+    <canvas id="myCanvas"></canvas>
+
+    <div class="tools">
+        <div class="tool">
+            <div class="shape" data-shape="circle">circle</div>
+            <div class="shape" data-shape="quad">quad</div>
+            <div class="shape" data-shape="triangle">triangle</div>
+        </div>
+
+        <div class="tool" style="background: rgba(237, 125, 125, 0.7)">
+            <div class="shape" data-color="red">red</div>
+            <div class="shape" data-color="blue">blue</div>
+            <div class="shape" data-color="green">green</div>
+            <div class="shape" data-color="default">default</div>
+        </div>
+    </div>
+
+    <script src="./src/shapes.js"></script>
+    <script src="./src/index.js"></script>
+    <script>
+        const canvasNode = document.querySelector("#myCanvas");
+        const app = new App(canvasNode);
+        const shapeMap = {
+            circle: Circle,
+            quad: Quad,
+            triangle: Triangle
+        };
+        const colorMap = {
+            red: '#ff0000',
+            blue: '#0000ff',
+            green: '#00ff00',
+            default: '#C6BAEE'
+        };
+        let currentFillColor = "#C6BAEE";
+        let currentStrokeColor = "#9D8CD7";
+        let currentStrokeWidth = 2;
+        let currentSize = 100;
+
+        canvasNode.addEventListener("mousemove", e => {
+            if (app.currentShape) {
+                app.currentShape.setPosition(e.clientX, e.clientY);
+            }
+        });
+
+        canvasNode.addEventListener("click", e => {
+
+            if (app.currentShape) {
+                const shapeClass = app.currentShape.constructor;
+                const shape = createShape(shapeClass, e.clientX, e.clientY);
+
+                app.addShape(app.currentShape);
+                app.setCurrentShape(shape);
+            } else {
+                for (let i = app.shapes.length - 1; i >= 0; i--) {
+                    if (app.shapes[i].havePoint(e.clientX, e.clientY)) {
+                        app.setCurrentShape(app.shapes[i]);
+                    }
+                }
+            }
+
+        });
+
+        canvasNode.addEventListener("wheel", e => {
+            e.preventDefault();
+
+            if (app.currentShape) {
+                currentSize = app.currentShape.size + e.deltaY;
+                app.currentShape.setSize(currentSize);
+            }
+        });
+
+        document.addEventListener("keydown", e => {
+            if (e.keyCode === 27) {
+                app.setCurrentShape(null);
+            }
+        });
+
+        document.addEventListener("click", e => {
+            const shape = e.target.dataset.shape;
+
+            if (shape && shapeMap.hasOwnProperty(shape)) {
+                const shapeClass = shapeMap[shape];
+                const newShape = createShape(shapeClass);
+
+                app.setCurrentShape(newShape);
+            }
+
+            const color = e.target.dataset.color;
+
+            if (color && colorMap.hasOwnProperty(color)) {
+                currentFillColor = colorMap[color];
+            }
+        });
+
+        window.addEventListener("load", onResize);
+        window.addEventListener("resize", onResize);
+
+        function createShape(ShapeClass, x, y) {
+            const shape = new ShapeClass(x, y, currentSize);
+
+            shape.setFillColor(currentFillColor);
+            shape.setStrokeColor(currentStrokeColor);
+            shape.setStrokeWidth(currentStrokeWidth);
+
+            return shape;
+        }
+
+        function onResize() {
+            canvasNode.width = window.innerWidth;
+            canvasNode.height = window.innerHeight;
+        }
+    </script>
 </body>
+
 </html>
